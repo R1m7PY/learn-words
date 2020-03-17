@@ -2,7 +2,7 @@ import sqlite3
 
 from sqlite3 import Error
 
-def sql_connection():
+def sql_connection(): # подключение к БД
 
     try:
 
@@ -14,7 +14,7 @@ def sql_connection():
 
         print(Error)
 
-def sql_table(con):
+def sql_table(con): # создание новой таблицы в БД
 
     cursorObj = con.cursor()
 

@@ -14,14 +14,14 @@ def sql_connection():
 
         print(Error)
 
-def sql_update(con, update, NewWord, IDword):
+def sql_update(con, update, NewWord, IDword, table):
 
 	cursorObj = con.cursor()
 
 	if update == 'word':
-		cursorObj.execute('UPDATE employees SET word = ? where id = ?', (NewWord, IDword))
+		cursorObj.execute('UPDATE %s SET word = ? where id = ?' % (table), (NewWord, IDword))
 	elif update == 'translation':
-		cursorObj.execute('UPDATE employees SET translation = ? where id = ?', (NewWord, IDword))
+		cursorObj.execute('UPDATE %s SET translation = ? where id = ?' % (table), (NewWord, IDword))
 	else:
 		print("input error")
 
@@ -33,16 +33,19 @@ def data_update():
 	global update
 	global NewWord
 
+	print("specified table:")
+	table = str(input())
 	print("where change:")
 	IDword = int(input())
 	print("what change:")
 	update = str(input())
 	print("how change:")
 	NewWord = str(input())
+	return table
 
 con = sql_connection()
 update = str()
 NewWord = str()
 IDword = int()
-data_update()
-sql_update(con, update, NewWord, IDword)
+table = data_update()
+sql_update(con, update, NewWord, IDword, table)

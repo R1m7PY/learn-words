@@ -14,10 +14,21 @@ def sql_connection(): # подключение к БД
 
         print(Error)
 
+def sql_table(con): # создание новой таблицы в БД
+
+    	cursorObj = con.cursor()
+    	print("name the new table:")
+    	table = str(input())
+    	cursorObj.execute("CREATE TABLE %s(id integer PRINARY KEY, word, translation)" %(table))
+    	con.commit()
+    	print("table created")
+
 def sql_filling(con, data): # заполнение таблицы
 
 		cursorObj = con.cursor()
-		cursorObj.execute('INSERT INTO employees(id, word, translation) VALUES(?, ?, ?)', data)
+		print("specified table")
+		table = str(input())
+		cursorObj.execute('INSERT INTO %s(id, word, translation) VALUES(?, ?, ?)' % (table), (data))
 		con.commit()
 
 def data_filling(): # ввод данных для заполнения таблицы
@@ -32,14 +43,14 @@ def data_filling(): # ввод данных для заполнения табл
 
 	return data
 
-def sql_update(con, update, NewWord, IDword):
+def sql_update(con, update, NewWord, IDword, table):
 
 	cursorObj = con.cursor()
 
 	if update == 'word':
-		cursorObj.execute('UPDATE employees SET word = ? where id = ?', (NewWord, IDword))
+		cursorObj.execute('UPDATE %s SET word = ? where id = ?'  % (table), (NewWord, IDword))
 	elif update == 'translation':
-		cursorObj.execute('UPDATE employees SET translation = ? where id = ?', (NewWord, IDword))
+		cursorObj.execute('UPDATE %s SET translation = ? where id = ?' % (table), (NewWord, IDword))
 	else:
 		print("input error")
 
@@ -47,38 +58,51 @@ def sql_update(con, update, NewWord, IDword):
 
 def data_update():
 
-	global IDword
 	global update
 	global NewWord
 
-	print("where change:")
-	IDword = int(input())
+	print("specified table")
+	table = str(input())
 	print("what change:")
 	update = str(input())
 	print("how change:")
 	NewWord = str(input())
+	return table
+
+def count_table(con):
+	cursorObj = con.cursor()
+	cursorObj.execute('SELECT * FROM all_words')
+	rows = cursorObj.fetchall()
+	return len(rows)
 
 con = sql_connection()
-update = str()
-NewWord = str()
-IDword = int()
 answer = True
 
 while answer == True:
 	console = str(input())
+	update = str()
+	NewWord = str()
+	IDword = int(count_table(con) + 1)
 
 	if console == 'update':
-		data_update()
-		sql_update(con, update, NewWord, IDword)
+		table = data_update()
+		sql_update(con, update, NewWord, IDword, table)
 		answer = True
-
-	elif console == 'exit':
-		answer = False
+		print("The table was updated in successfully")
 
 	elif console == 'filling':
 		data = data_filling()
 		sql_filling(con, data)
 		answer = True
+		print("the table was filled in successfully")
+
+	elif console == 'create table':
+		sql_table(con)
+		answer = True
+
+	elif console == 'exit':
+		con.close()
+		answer = False
 
 	else:
 		print("This command does not exist")

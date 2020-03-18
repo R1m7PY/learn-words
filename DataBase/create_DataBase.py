@@ -17,8 +17,11 @@ def sql_connection(): # подключение к БД
 def sql_table(con): # создание новой таблицы в БД
 
     	cursorObj = con.cursor()
-    	cursorObj.execute("CREATE TABLE employees(id integer PRINARY KEY, word, translation)")
+    	print("name the new table:")
+    	table = str(input())
+    	cursorObj.execute("CREATE TABLE %s(id integer PRINARY KEY, word, translation)" %(table))
     	con.commit()
+    	print("table created")
 
 con = sql_connection()
 sql_table(con)

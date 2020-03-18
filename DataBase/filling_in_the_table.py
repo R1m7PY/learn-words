@@ -17,7 +17,7 @@ def sql_connection():
 def sql_filling(con, data): # заполнение таблицы
 
 		cursorObj = con.cursor()
-		cursorObj.execute('INSERT INTO employees(id, word, translation) VALUES(?, ?, ?)', data)
+		cursorObj.execute('INSERT INTO all_words(id, word, translation) VALUES(?, ?, ?)', data)
 		con.commit()
 
 def data_filling(): # ввод данных для заполнения таблицы

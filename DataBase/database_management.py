@@ -105,6 +105,14 @@ while answer == True:
 		table = str(input())
 		answer = True
 
+	elif console == "help":
+		print("update")
+		print("filling")
+		print("create table")
+		print("disconnecting table")
+		print("exit")
+		print("help")
+
 	elif console == 'exit': # закрывает программу
 		con.close()
 		answer = False

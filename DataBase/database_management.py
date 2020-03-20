@@ -17,25 +17,20 @@ def sql_connection(): # подключение к БД
 def sql_table(con): # создание новой таблицы в БД
 
     	cursorObj = con.cursor()
-    	print("name the new table:")
-    	table = str(input())
     	cursorObj.execute("CREATE TABLE %s(id integer PRINARY KEY, word, translation)" %(table))
     	con.commit()
     	print("table created")
 
 def sql_filling(con, data): # заполнение таблицы
 
+		IDword = int(int(count_table(con)) + 1)
 		cursorObj = con.cursor()
-		print("specified table")
-		table = str(input())
-		cursorObj.execute('INSERT INTO %s(id, word, translation) VALUES(?, ?, ?)' % (table), (data))
+		cursorObj.execute('INSERT INTO %s(id, word, translation) VALUES(%s, ?, ?)' % (table, IDword), (data))
 		con.commit()
 
 def data_filling(): # ввод данных для заполнения таблицы
 
 	data = []
-	print("filling id:")
-	data.append(int(input()))
 	print("filling new word:")
 	data.append(str(input()))
 	print("filling translation new word's:")
@@ -43,7 +38,7 @@ def data_filling(): # ввод данных для заполнения табл
 
 	return data
 
-def sql_update(con, update, NewWord, IDword, table):
+def sql_update(con, update, NewWord, IDword, table): # осн. функция замены
 
 	cursorObj = con.cursor()
 
@@ -56,54 +51,64 @@ def sql_update(con, update, NewWord, IDword, table):
 
 	con.commit()
 
-def data_update():
+def data_update(): # доп. функция для изменения таблица
 
 	global update
 	global NewWord
+	global IDword
 
-	print("specified table")
-	table = str(input())
+	print("where change:")
+	IDword = int(input()) # ввод строки, которая будет изменяться
 	print("what change:")
-	update = str(input())
+	update = str(input()) # ввод столбца, в котором будут изменения 
 	print("how change:")
-	NewWord = str(input())
-	return table
+	NewWord = str(input()) # слово замены
 
-def count_table(con):
+def count_table(con): # возвращает количество строк в таблице
 	cursorObj = con.cursor()
-	cursorObj.execute('SELECT * FROM all_words')
+	cursorObj.execute('SELECT * FROM %s' % (table))
 	rows = cursorObj.fetchall()
 	return len(rows)
 
 con = sql_connection()
 answer = True
+print("Connecting to a table:")
+table = str(input()) # подключение к таблице
 
 while answer == True:
-	console = str(input())
-	update = str()
-	NewWord = str()
-	IDword = int(count_table(con) + 1)
+	console = str(input(table + " >>> ")) # ввод команды
+	
+# проверка введенной команды
 
-	if console == 'update':
-		table = data_update()
+	if console == 'update': # изменение таблицы
+		NewWord = str()
+		update = str()		
+		data_update()
 		sql_update(con, update, NewWord, IDword, table)
 		answer = True
 		print("The table was updated in successfully")
 
-	elif console == 'filling':
+	elif console == 'filling': # добавление новых слов в таблицу
 		data = data_filling()
 		sql_filling(con, data)
 		answer = True
 		print("the table was filled in successfully")
 
-	elif console == 'create table':
+	elif console == 'create table': # создание новой таблицы
+		print("name new table:")
+		table = str(input())
 		sql_table(con)
 		answer = True
 
-	elif console == 'exit':
+	elif console == "disconnecting table": # переподключение к таблице
+		print("table:")
+		table = str(input())
+		answer = True
+
+	elif console == 'exit': # закрывает программу
 		con.close()
 		answer = False
 
 	else:
-		print("This command does not exist")
+		print("This command does not exist") # сообщает об ошибке ввода команды
 		answer = True

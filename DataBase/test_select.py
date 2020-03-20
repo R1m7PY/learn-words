@@ -14,11 +14,12 @@ def sql_connection():
 
         print(Error)
 
-def count_table(con):
+def count_table(con): # возвращает количество строк в таблице
 	cursorObj = con.cursor()
-	cursorObj.execute('SELECT * FROM all_words')
+	cursorObj.execute('SELECT * FROM %s' % (table))
 	rows = cursorObj.fetchall()
 	print(len(rows))
 
 con = sql_connection()
+table = str(input())
 count_table(con)

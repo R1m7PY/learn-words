@@ -17,9 +17,12 @@ def sql_connection(): # подключение к БД
 def sql_table(con): # создание новой таблицы в БД
 
     	cursorObj = con.cursor()
-    	cursorObj.execute("CREATE TABLE %s(id integer PRINARY KEY, word, translation)" %(table))
-    	con.commit()
-    	print("table created")
+    	if len(sql_checking(con)) == 0: # проверка существования таблицы
+    		cursorObj.execute("CREATE TABLE %s(id integer PRINARY KEY, word, translation)" % (table))
+    		con.commit()
+    		print("table created")
+    	else:
+    		print("this table already exists")    	
 
 def sql_filling(con, data): # заполнение таблицы
 
@@ -70,12 +73,50 @@ def count_table(con): # возвращает количество строк в 
 	rows = cursorObj.fetchall()
 	return len(rows)
 
+def sql_delete(con): # функция удаления таблицы
+
+	cursorObj = con.cursor()
+	if len(sql_checking(con)) != 0: # проверка существования таблицы 
+		cursorObj.execute('DROP table %s' % (table))
+		con.commit()
+		print("table deleted")
+	else:
+		print("there is no such table")
+
+def sql_checking(con): # функция проверки существования таблицы
+
+	cursorObj = con.cursor()
+	cursorObj.execute('SELECT name from sqlite_master WHERE type = "table" AND name = "%s"' % (table))
+	return cursorObj.fetchall() # возвращает массив таблиц с такими же именами
+	con.commit()
+
+def sql_output(con): # функция, возвращающая список таблиц
+
+	cursorObj = con.cursor()
+	cursorObj.execute('SELECT name from sqlite_master where type= "table"')
+	a = cursorObj.fetchall()
+	for i in range(len(a) - 2):
+		print(a[i])
+
+def sql_delete_row(con): # функция удаления строки
+
+	cursorObj = con.cursor()
+	cursorObj.execute('DELETE FROM %s WHERE %s = "%s"' % (table, what, row))
+	con.commit()
+	print("row deleted")
+
+
 con = sql_connection()
 answer = True
+sql_output(con)
 print("Connecting to a table:")
 table = str(input()) # подключение к таблице
 
 while answer == True:
+	if len(sql_checking(con)) == 0: # проверка существования таблицы
+		print("there is no such table")
+		table = str(input("enter a different table: "))
+		continue
 	console = str(input(table + " >>> ")) # ввод команды
 	
 # проверка введенной команды
@@ -85,14 +126,14 @@ while answer == True:
 		update = str()		
 		data_update()
 		sql_update(con, update, NewWord, IDword, table)
-		answer = True
 		print("The table was updated in successfully")
+		answer = True
 
 	elif console == 'filling': # добавление новых слов в таблицу
 		data = data_filling()
 		sql_filling(con, data)
-		answer = True
 		print("the table was filled in successfully")
+		answer = True
 
 	elif console == 'create table': # создание новой таблицы
 		print("name new table:")
@@ -101,8 +142,19 @@ while answer == True:
 		answer = True
 
 	elif console == "disconnecting table": # переподключение к таблице
+		sql_output(con)
 		print("table:")
 		table = str(input())
+		answer = True
+
+	elif console == "delete table": # удаление таблицы
+		sql_delete(con)
+		answer = True
+
+	elif console == "delete row": # удаление строки
+		what = str(input("what: ")) # указание ключа
+		row = str(input("row: ")) # значение ключа
+		sql_delete_row(con)
 		answer = True
 
 	elif console == "help":
@@ -110,8 +162,11 @@ while answer == True:
 		print("filling")
 		print("create table")
 		print("disconnecting table")
+		print("delete table")
+		print("delete row")
 		print("exit")
 		print("help")
+		answer = True
 
 	elif console == 'exit': # закрывает программу
 		con.close()

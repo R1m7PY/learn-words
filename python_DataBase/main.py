@@ -103,7 +103,7 @@ def sql_delete_row(con): # функция удаления строки
 	cursorObj = con.cursor()
 	cursorObj.execute('DELETE FROM %s WHERE %s = "%s"' % (table, what, row))
 	con.commit()
-	print("row deleted")
+	print("row deleted") # сообщение об удалении
 
 
 con = sql_connection()
